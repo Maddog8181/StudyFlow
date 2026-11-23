@@ -109,7 +109,7 @@ def main(argv=None):
     try:
         if args.command in (None, "demo"):
             tasks = load_tasks(EXAMPLE_FILE)
-            print(f"StudyFlow — учебные задания на {DEMO_DATE}.")
+            print(f"StudyFlow — демонстрация на дату {DEMO_DATE}; данные примера не изменяются.")
             show_tasks(tasks, DEMO_DATE)
             return 0
         tasks = load_tasks(args.file)
