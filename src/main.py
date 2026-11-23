@@ -81,6 +81,13 @@ def task_status(task, today):
     return "сегодня" if deadline == today else "ожидает"
 
 
+def summarize(tasks, today):
+    completed = sum(task["done"] for task in tasks)
+    return {"total": len(tasks), "completed": completed,
+            "pending": len(tasks) - completed,
+            "overdue": sum(task_status(task, today) == "просрочено" for task in tasks)}
+
+
 def show_tasks(tasks, today):
     if not tasks:
         print("Заданий пока нет. Добавь первое командой add.")
@@ -89,12 +96,19 @@ def show_tasks(tasks, today):
               f'срок: {task["due"]} | {task_status(task, today)}')
 
 
+def show_summary(tasks, today):
+    result = summarize(tasks, today)
+    print(f'Всего: {result["total"]} | Готово: {result["completed"]} | '
+          f'Осталось: {result["pending"]} | Просрочено: {result["overdue"]}')
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description="StudyFlow — учёт учебных заданий и сроков")
     parser.add_argument("--file", type=Path, default=DEFAULT_FILE, help="файл личных заданий")
     commands = parser.add_subparsers(dest="command", title="команды")
     commands.add_parser("demo", help="пример без изменения личных данных (по умолчанию)")
     commands.add_parser("list", help="список личных заданий по срокам")
+    commands.add_parser("summary", help="количество готовых и просроченных заданий")
     adding = commands.add_parser("add", help="добавить задание")
     adding.add_argument("title", help="название задания в кавычках")
     adding.add_argument("--subject", required=True, help="учебный предмет")
@@ -109,8 +123,9 @@ def main(argv=None):
     try:
         if args.command in (None, "demo"):
             tasks = load_tasks(EXAMPLE_FILE)
-            print(f"StudyFlow — демонстрация на дату {DEMO_DATE}; данные примера не изменяются.")
+            print(f"StudyFlow — демонстрация на дату {DEMO_DATE}; личные данные не изменяются.")
             show_tasks(tasks, DEMO_DATE)
+            show_summary(tasks, DEMO_DATE)
             return 0
         tasks = load_tasks(args.file)
         today = date.today()
@@ -125,6 +140,9 @@ def main(argv=None):
         elif args.command == "list":
             print(f"StudyFlow — задания на {today}")
             show_tasks(tasks, today)
+        elif args.command == "summary":
+            print(f"StudyFlow — сводка на {today}")
+            show_summary(tasks, today)
         return 0
     except (ValueError, OSError) as error:
         print(f"Ошибка: {error}", file=sys.stderr)
