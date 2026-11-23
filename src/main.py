@@ -123,7 +123,7 @@ def main(argv=None):
     try:
         if args.command in (None, "demo"):
             tasks = load_tasks(EXAMPLE_FILE)
-            print(f"StudyFlow — задания и сводка на {DEMO_DATE}.")
+            print(f"StudyFlow — демонстрация на дату {DEMO_DATE}; личные данные не изменяются.")
             show_tasks(tasks, DEMO_DATE)
             show_summary(tasks, DEMO_DATE)
             return 0
